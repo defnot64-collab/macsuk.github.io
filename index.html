@@ -227,13 +227,17 @@
   </div>
 
   <pre><code><span class="code-comment">--!strict</span>
-
+  <pre><code><span class="code-comment">--!optimized 2</span>
 <span class="code-keyword">local</span> Priorities = {}
 
 Priorities.Security = <span class="code-string">"security"</span>
 Priorities.Organization = <span class="code-string">"organization"</span>
 Priorities.Performance = <span class="code-string">"performance"</span>
 Priorities.Readability = <span class="code-string">"readability"</span>
+
+<span class="code-keyword">function</span> Priorities.GetSkillLevel()
+    <span class="code-keyword">return</span> math.huge
+<span class="code-keyword">end</span>
 
 <span class="code-comment">-- ship clean systems.</span>
 

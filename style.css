@@ -426,6 +426,18 @@ a { color: inherit; text-decoration: none; }
   padding-bottom: 120px;
 }
 
+.code-keyword {
+  color: #d8c98c;
+}
+
+.code-string {
+  color: #a9c98a;
+}
+
+.code-comment {
+  color: #77786f;
+}
+
 .contact-box {
   padding: clamp(28px, 6vw, 65px);
   text-align: center;

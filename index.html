@@ -220,22 +220,25 @@
           </p>
         </div>
 
-        <div class="terminal">
-          <div class="terminal-head">
-            <span>macsuk.lua</span>
-            <span>● ● ●</span>
-          </div>
-          <pre><code><span class="code-comment">-- things I value</span>
-local priorities = {
-    "security",
-    "organization",
-    "performance",
-    "readability",
-}
+       <div class="terminal">
+  <div class="terminal-head">
+    <span>Priorities.lua</span>
+    <span>● ● ●</span>
+  </div>
 
-<span class="code-comment">-- ship clean systems.</span></code></pre>
-        </div>
-      </div>
+  <pre><code><span class="code-comment">--!strict</span>
+
+<span class="code-keyword">local</span> Priorities = {}
+
+Priorities.Security = <span class="code-string">"security"</span>
+Priorities.Organization = <span class="code-string">"organization"</span>
+Priorities.Performance = <span class="code-string">"performance"</span>
+Priorities.Readability = <span class="code-string">"readability"</span>
+
+<span class="code-comment">-- ship clean systems.</span>
+
+<span class="code-keyword">return</span> Priorities</code></pre>
+</div>
     </section>
 
     <section id="contact" class="section contact-section">

@@ -578,9 +578,6 @@ code {
     padding: 12px 10px;
     border-bottom: 1px solid rgba(255,255,255,.1);
   }
-.media-card:nth-child(5) {
-  grid-column: 2;
-}
   .menu-toggle { display: block; }
 
   .section {
@@ -642,7 +639,7 @@ code {
 .media-card:nth-child(2) { transform: rotate(-.7deg); }
 .media-card:nth-child(3) { transform: rotate(.6deg); }
 .media-card:nth-child(4) { transform: rotate(-.4deg); }
-
+.media-card:nth-child(5) { grid-column: 2;            }
 .media-frame {
   aspect-ratio: 16 / 9;
   background: #303133;

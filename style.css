@@ -67,6 +67,11 @@ body::before {
   border-left-color: transparent;
   border-bottom-color: transparent;
   filter: blur(.3px);
+  transition:
+    top 1s ease,
+    left 1s ease,
+    right 1s ease,
+    transform 1s ease;
 }
 
 .scribble-left {

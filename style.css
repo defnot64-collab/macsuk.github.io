@@ -62,16 +62,18 @@ body::before {
   position: fixed;
   pointer-events: none;
   opacity: .18;
-  z-index: -1;
+  z-index: 1;
+
   border: 5px solid var(--ink-soft);
   border-left-color: transparent;
   border-bottom-color: transparent;
+
   filter: blur(.3px);
+
   transition:
-    top 1s ease,
-    left 1s ease,
-    right 1s ease,
-    transform 1s ease;
+    left 1.2s cubic-bezier(.22, .61, .36, 1),
+    top 1.2s cubic-bezier(.22, .61, .36, 1),
+    transform 1.2s cubic-bezier(.22, .61, .36, 1);
 }
 
 .scribble-left {
@@ -86,8 +88,8 @@ body::before {
 .scribble-right {
   width: 470px;
   height: 650px;
-  right: -350px;
-  top: 4%;
+  left: calc(100% - 120px);
+  top: 10%;
   border-radius: 40% 55% 45% 60%;
   transform: rotate(18deg);
 }

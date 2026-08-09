@@ -19,93 +19,6 @@ if (toggle && menu) {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// Random moving scribbles
-const scribbles = document.querySelectorAll(".scribble");
-
-const scribblePositions = [
-  { side: "left",  x: -240, y: 15 },
-  { side: "left",  x: -170, y: 45 },
-  { side: "left",  x: -300, y: 75 },
-
-  { side: "right", x: -250, y: 10 },
-  { side: "right", x: -180, y: 38 },
-  { side: "right", x: -320, y: 70 },
-
-  { side: "top",   x: 15, y: -220 },
-  { side: "top",   x: 55, y: -180 },
-
-  { side: "bottom", x: 20, y: -180 },
-  { side: "bottom", x: 65, y: -220 }
-];
-
-function moveScribble(scribble) {
-  const position =
-    scribblePositions[
-      Math.floor(Math.random() * scribblePositions.length)
-    ];
-
-  const rotation = Math.floor(Math.random() * 61) - 30;
-
-  // Reset positioning
-  scribble.style.left = "";
-  scribble.style.right = "";
-  scribble.style.top = "";
-  scribble.style.bottom = "";
-
-  if (position.side === "left") {
-    scribble.style.left = `${position.x}px`;
-    scribble.style.top = `${position.y}vh`;
-  }
-
-  if (position.side === "right") {
-    scribble.style.right = `${position.x}px`;
-    scribble.style.top = `${position.y}vh`;
-  }
-
-  if (position.side === "top") {
-    scribble.style.left = `${position.x}vw`;
-    scribble.style.top = `${position.y}px`;
-  }
-
-  if (position.side === "bottom") {
-    scribble.style.left = `${position.x}vw`;
-    scribble.style.bottom = `${position.y}px`;
-  }
-
-  scribble.style.transform = `rotate(${rotation}deg)`;
-}
-
-let lastScrollY = window.scrollY;
-let scrollTimeout;
-
-window.addEventListener("scroll", () => {
-  const currentScrollY = window.scrollY;
-
-  // Only move when the user actually scrolls
-  if (Math.abs(currentScrollY - lastScrollY) > 30) {
-    scribbles.forEach((scribble) => {
-      moveScribble(scribble);
-    });
-
-    lastScrollY = currentScrollY;
-  }
-
-  // Don't move again until scrolling pauses
-  clearTimeout(scrollTimeout);
-
-  scrollTimeout = setTimeout(() => {
-    scribbles.forEach((scribble) => {
-      moveScribble(scribble);
-    });
-  }, 250);
-});
-
-// Give each scribble a random starting position
-scribbles.forEach((scribble) => {
-  moveScribble(scribble);
-});
-
-
 const discordButton = document.getElementById("discord-copy");
 const copyLabel = document.getElementById("copy-label");
 
@@ -120,3 +33,91 @@ if (discordButton && copyLabel) {
     }
   });
 }
+
+// ==========================================
+// RANDOM SCROLLING SCRIBBLES
+// ==========================================
+
+const scribbles = document.querySelectorAll(".scribble");
+
+const scribbleLocations = [
+  // Left edge
+  { left: "-260px", top: "15vh" },
+  { left: "-190px", top: "38vh" },
+  { left: "-280px", top: "68vh" },
+
+  // Right edge
+  { left: "calc(100% - 140px)", top: "12vh" },
+  { left: "calc(100% - 220px)", top: "42vh" },
+  { left: "calc(100% - 100px)", top: "72vh" },
+
+  // Top
+  { left: "15vw", top: "-230px" },
+  { left: "55vw", top: "-180px" },
+  { left: "75vw", top: "-250px" },
+
+  // Bottom
+  { left: "10vw", top: "calc(100vh - 80px)" },
+  { left: "45vw", top: "calc(100vh - 120px)" },
+  { left: "75vw", top: "calc(100vh - 70px)" },
+
+  // Random-looking middle positions
+  { left: "8vw", top: "25vh" },
+  { left: "72vw", top: "30vh" },
+  { left: "20vw", top: "65vh" },
+  { left: "82vw", top: "60vh" }
+];
+
+function moveScribbles() {
+  scribbles.forEach((scribble, index) => {
+
+    // Make sure the two scribbles don't always
+    // choose the same position.
+    let location =
+      scribbleLocations[
+        Math.floor(Math.random() * scribbleLocations.length)
+      ];
+
+    // Apply position
+    scribble.style.left = location.left;
+    scribble.style.top = location.top;
+
+    // Random rotation
+    const rotation = Math.floor(Math.random() * 70) - 35;
+
+    // Slightly different scale
+    const scale = 0.85 + Math.random() * 0.3;
+
+    scribble.style.transform =
+      `rotate(${rotation}deg) scale(${scale})`;
+  });
+}
+
+// Initial positions
+moveScribbles();
+
+let lastScrollPosition = window.scrollY;
+let scrollCooldown = false;
+
+window.addEventListener("scroll", () => {
+
+  const currentScrollPosition = window.scrollY;
+
+  // Only trigger after moving at least 80px
+  if (
+    Math.abs(currentScrollPosition - lastScrollPosition) < 80 ||
+    scrollCooldown
+  ) {
+    return;
+  }
+
+  lastScrollPosition = currentScrollPosition;
+  scrollCooldown = true;
+
+  moveScribbles();
+
+  // Prevent the scribbles from changing constantly
+  setTimeout(() => {
+    scrollCooldown = false;
+  }, 700);
+});

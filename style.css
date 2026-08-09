@@ -58,41 +58,38 @@ body::before {
   background: linear-gradient(100deg, transparent 0 38%, rgba(70,69,64,.025) 39% 40%, transparent 41% 100%);
 }
 
-.scribble {
+/* Moving snake scribbles */
+
+#scribble-layer {
   position: fixed;
+  inset: 0;
   pointer-events: none;
-  opacity: .18;
-  z-index: 1;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.snake-scribble {
+  position: absolute;
+  width: 420px;
+  height: 220px;
 
   border: 5px solid var(--ink-soft);
   border-left-color: transparent;
   border-bottom-color: transparent;
 
+  border-radius: 50% 60% 45% 65%;
+
+  opacity: .16;
   filter: blur(.3px);
 
-  transition:
-    left 1.2s cubic-bezier(.22, .61, .36, 1),
-    top 1.2s cubic-bezier(.22, .61, .36, 1),
-    transform 1.2s cubic-bezier(.22, .61, .36, 1);
+  will-change: transform;
 }
 
-.scribble-left {
-  width: 430px;
-  height: 300px;
-  left: -245px;
-  top: 48%;
-  border-radius: 45% 60% 55% 35%;
-  transform: rotate(-24deg);
-}
+.scribble {position: fixed;pointer-events: none;opacity: .18;z-index: -1;border: 5px solid var(--ink-soft);border-left-color: transparent;border-bottom-color: transparent;filter: blur(.3px);}
 
-.scribble-right {
-  width: 470px;
-  height: 650px;
-  left: calc(100% - 120px);
-  top: 10%;
-  border-radius: 40% 55% 45% 60%;
-  transform: rotate(18deg);
-}
+.scribble-left {width: 430px;height: 300px;left: -245px;top: 48%;border-radius: 45% 60% 55% 35%;transform: rotate(-24deg);}
+
+.scribble-right {width: 470px;height: 650px;right: -350px;top: 4%;border-radius: 40% 55% 45% 60%;transform: rotate(18deg);}
 
 a { color: inherit; text-decoration: none; }
 

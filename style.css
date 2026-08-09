@@ -639,7 +639,10 @@ code {
 .media-card:nth-child(2) { transform: rotate(-.7deg); }
 .media-card:nth-child(3) { transform: rotate(.6deg); }
 .media-card:nth-child(4) { transform: rotate(-.4deg); }
-.media-card:nth-child(5) { grid-column: 2;            }
+.media-card:nth-child(5) {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
 .media-frame {
   aspect-ratio: 16 / 9;
   background: #303133;

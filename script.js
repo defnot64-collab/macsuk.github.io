@@ -35,89 +35,127 @@ if (discordButton && copyLabel) {
 }
 
 // ==========================================
-// RANDOM SCROLLING SCRIBBLES
+// SLOW SNAKE SCRIBBLES
 // ==========================================
 
-const scribbles = document.querySelectorAll(".scribble");
+const scribbleLayer = document.getElementById("scribble-layer");
 
-const scribbleLocations = [
-  // Left edge
-  { left: "-260px", top: "15vh" },
-  { left: "-190px", top: "38vh" },
-  { left: "-280px", top: "68vh" },
-
-  // Right edge
-  { left: "calc(100% - 140px)", top: "12vh" },
-  { left: "calc(100% - 220px)", top: "42vh" },
-  { left: "calc(100% - 100px)", top: "72vh" },
-
-  // Top
-  { left: "15vw", top: "-230px" },
-  { left: "55vw", top: "-180px" },
-  { left: "75vw", top: "-250px" },
-
-  // Bottom
-  { left: "10vw", top: "calc(100vh - 80px)" },
-  { left: "45vw", top: "calc(100vh - 120px)" },
-  { left: "75vw", top: "calc(100vh - 70px)" },
-
-  // Random-looking middle positions
-  { left: "8vw", top: "25vh" },
-  { left: "72vw", top: "30vh" },
-  { left: "20vw", top: "65vh" },
-  { left: "82vw", top: "60vh" }
+const snakeEdges = [
+  "left",
+  "right",
+  "top",
+  "bottom"
 ];
 
-function moveScribbles() {
-  scribbles.forEach((scribble, index) => {
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
-    // Make sure the two scribbles don't always
-    // choose the same position.
-    let location =
-      scribbleLocations[
-        Math.floor(Math.random() * scribbleLocations.length)
-      ];
+function createSnake() {
+  if (!scribbleLayer) return;
 
-    // Apply position
-    scribble.style.left = location.left;
-    scribble.style.top = location.top;
+  const snake = document.createElement("div");
+  snake.className = "snake-scribble";
 
-    // Random rotation
-    const rotation = Math.floor(Math.random() * 70) - 35;
+  const edge = snakeEdges[
+    Math.floor(Math.random() * snakeEdges.length)
+  ];
 
-    // Slightly different scale
-    const scale = 0.85 + Math.random() * 0.3;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
 
-    scribble.style.transform =
-      `rotate(${rotation}deg) scale(${scale})`;
+  let startX;
+  let startY;
+  let endX;
+  let endY;
+
+  // Start and finish on DIFFERENT edges.
+  switch (edge) {
+
+    case "left":
+      startX = -500;
+      startY = randomBetween(100, vh - 100);
+
+      endX = vw + 500;
+      endY = randomBetween(100, vh - 100);
+      break;
+
+    case "right":
+      startX = vw + 500;
+      startY = randomBetween(100, vh - 100);
+
+      endX = -500;
+      endY = randomBetween(100, vh - 100);
+      break;
+
+    case "top":
+      startX = randomBetween(100, vw - 100);
+      startY = -350;
+
+      endX = randomBetween(100, vw - 100);
+      endY = vh + 350;
+      break;
+
+    case "bottom":
+      startX = randomBetween(100, vw - 100);
+      startY = vh + 350;
+
+      endX = randomBetween(100, vw - 100);
+      endY = -350;
+      break;
+  }
+
+  // Random organic curve
+  const curveX = randomBetween(-250, 250);
+  const curveY = randomBetween(-180, 180);
+
+  const rotation = randomBetween(-35, 35);
+
+  snake.style.transform =
+    `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
+
+  scribbleLayer.appendChild(snake);
+
+  const duration = randomBetween(12000, 20000);
+
+  const animation = snake.animate(
+    [
+      {
+        transform:
+          `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`
+      },
+
+      {
+        transform:
+          `translate(
+            ${((startX + endX) / 2) + curveX}px,
+            ${((startY + endY) / 2) + curveY}px
+          )
+          rotate(${rotation + randomBetween(-15, 15)}deg)`
+      },
+
+      {
+        transform:
+          `translate(${endX}px, ${endY}px)
+          rotate(${rotation + randomBetween(-25, 25)}deg)`
+      }
+    ],
+    {
+      duration,
+      easing: "ease-in-out",
+      fill: "forwards"
+    }
+  );
+
+  animation.finished.then(() => {
+    snake.remove();
+
+    // Wait before another snake appears
+    setTimeout(() => {
+      createSnake();
+    }, randomBetween(1500, 5000));
   });
 }
 
-// Initial positions
-moveScribbles();
-
-let lastScrollPosition = window.scrollY;
-let scrollCooldown = false;
-
-window.addEventListener("scroll", () => {
-
-  const currentScrollPosition = window.scrollY;
-
-  // Only trigger after moving at least 80px
-  if (
-    Math.abs(currentScrollPosition - lastScrollPosition) < 80 ||
-    scrollCooldown
-  ) {
-    return;
-  }
-
-  lastScrollPosition = currentScrollPosition;
-  scrollCooldown = true;
-
-  moveScribbles();
-
-  // Prevent the scribbles from changing constantly
-  setTimeout(() => {
-    scrollCooldown = false;
-  }, 700);
-});
+// Start with only ONE snake
+setTimeout(createSnake, 2500);

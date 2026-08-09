@@ -34,128 +34,100 @@ if (discordButton && copyLabel) {
   });
 }
 
-// ==========================================
-// SLOW SNAKE SCRIBBLES
-// ==========================================
-
-const scribbleLayer = document.getElementById("scribble-layer");
-
-const snakeEdges = [
-  "left",
-  "right",
-  "top",
-  "bottom"
-];
-
-function randomBetween(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
 function createSnake() {
   if (!scribbleLayer) return;
-
-  const snake = document.createElement("div");
-  snake.className = "snake-scribble";
-
-  const edge = snakeEdges[
-    Math.floor(Math.random() * snakeEdges.length)
-  ];
 
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  let startX;
-  let startY;
-  let endX;
-  let endY;
-
-  // Start and finish on DIFFERENT edges.
-  switch (edge) {
-
-    case "left":
-      startX = -500;
-      startY = randomBetween(100, vh - 100);
-
-      endX = vw + 500;
-      endY = randomBetween(100, vh - 100);
-      break;
-
-    case "right":
-      startX = vw + 500;
-      startY = randomBetween(100, vh - 100);
-
-      endX = -500;
-      endY = randomBetween(100, vh - 100);
-      break;
-
-    case "top":
-      startX = randomBetween(100, vw - 100);
-      startY = -350;
-
-      endX = randomBetween(100, vw - 100);
-      endY = vh + 350;
-      break;
-
-    case "bottom":
-      startX = randomBetween(100, vw - 100);
-      startY = vh + 350;
-
-      endX = randomBetween(100, vw - 100);
-      endY = -350;
-      break;
+  // Pick two random edge points
+  const edges = ["left", "right", "top", "bottom"];
+  const edgeA = edges[Math.floor(Math.random() * edges.length)];
+  let edgeB = edges[Math.floor(Math.random() * edges.length)];
+  // Make sure they're different edges
+  while (edgeB === edgeA) {
+    edgeB = edges[Math.floor(Math.random() * edges.length)];
   }
 
-  // Random organic curve
-  const curveX = randomBetween(-250, 250);
-  const curveY = randomBetween(-180, 180);
-
-  const rotation = randomBetween(-35, 35);
-
-  snake.style.transform =
-    `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`;
-
-  scribbleLayer.appendChild(snake);
-
-  const duration = randomBetween(12000, 20000);
-
-  const animation = snake.animate(
-    [
-      {
-        transform:
-          `translate(${startX}px, ${startY}px) rotate(${rotation}deg)`
-      },
-
-      {
-        transform:
-          `translate(
-            ${((startX + endX) / 2) + curveX}px,
-            ${((startY + endY) / 2) + curveY}px
-          )
-          rotate(${rotation + randomBetween(-15, 15)}deg)`
-      },
-
-      {
-        transform:
-          `translate(${endX}px, ${endY}px)
-          rotate(${rotation + randomBetween(-25, 25)}deg)`
-      }
-    ],
-    {
-      duration,
-      easing: "ease-in-out",
-      fill: "forwards"
+  function pointOnEdge(edge) {
+    switch (edge) {
+      case "left":   return { x: -10,      y: randomBetween(0, vh) };
+      case "right":  return { x: vw + 10,  y: randomBetween(0, vh) };
+      case "top":    return { x: randomBetween(0, vw), y: -10 };
+      case "bottom": return { x: randomBetween(0, vw), y: vh + 10 };
     }
-  );
+  }
 
-  animation.finished.then(() => {
-    snake.remove();
+  const start = pointOnEdge(edgeA);
+  const end   = pointOnEdge(edgeB);
 
-    // Wait before another snake appears
+  // 1–3 control points between start and end for a wobbly path
+  const cpCount = Math.floor(randomBetween(1, 4));
+  const controls = [];
+  for (let i = 0; i < cpCount; i++) {
+    controls.push({
+      x: randomBetween(vw * 0.05, vw * 0.95),
+      y: randomBetween(vh * 0.05, vh * 0.95),
+    });
+  }
+
+  // Build SVG path string: M start, C/Q through controls, end
+  let d = `M ${start.x} ${start.y}`;
+
+  if (controls.length === 1) {
+    d += ` Q ${controls[0].x} ${controls[0].y}, ${end.x} ${end.y}`;
+  } else if (controls.length === 2) {
+    d += ` C ${controls[0].x} ${controls[0].y}, ${controls[1].x} ${controls[1].y}, ${end.x} ${end.y}`;
+  } else {
+    // For 3 control points: move through two quadratics
+    const mid = {
+      x: (controls[0].x + controls[1].x) / 2,
+      y: (controls[0].y + controls[1].y) / 2,
+    };
+    d += ` Q ${controls[0].x} ${controls[0].y}, ${mid.x} ${mid.y}`;
+    d += ` Q ${controls[1].x} ${controls[1].y}, ${controls[2].x} ${controls[2].y}`;
+    d += ` Q ${controls[2].x} ${controls[2].y}, ${end.x} ${end.y}`;
+  }
+
+  // Create SVG element
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("snake-scribble");
+  svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", d);
+  svg.appendChild(path);
+  scribbleLayer.appendChild(svg);
+
+  // Animate with stroke-dasharray draw-on effect
+  const length = path.getTotalLength();
+  path.style.strokeDasharray  = length;
+  path.style.strokeDashoffset = length;
+
+  const drawDuration  = randomBetween(2500, 5000);
+  const holdDuration  = randomBetween(1500, 4000);
+  const fadeDuration  = randomBetween(1000, 2000);
+
+  // Draw on
+  path.animate(
+    [
+      { strokeDashoffset: length },
+      { strokeDashoffset: 0 },
+    ],
+    { duration: drawDuration, easing: "ease-in-out", fill: "forwards" }
+  ).finished.then(() => {
+    // Hold, then fade out
     setTimeout(() => {
-      createSnake();
-    }, randomBetween(1500, 5000));
+      path.animate(
+        [{ opacity: 0.18 }, { opacity: 0 }],
+        { duration: fadeDuration, easing: "ease-in", fill: "forwards" }
+      ).finished.then(() => {
+        svg.remove();
+        setTimeout(createSnake, randomBetween(800, 3000));
+      });
+    }, holdDuration);
   });
 }
 
-// Start with only ONE snake
-setTimeout(createSnake, 2500);
+setTimeout(createSnake, 1200);
